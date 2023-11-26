@@ -2,11 +2,15 @@
 import Navbar from './components/navbar'
 
 export default function Home() {
-  const paths = ['pacientes', 'consultas', 'medicos'];
+  const routeNavigation = [
+    { name: 'Home', path: '', current: true },
+    { name: 'Médicos', path: 'medicos', current: false },
+    { name: 'Pacientes', path: 'pacientes', current: false },
+    { name: 'Consultas', path: 'consultas', current: false },
+]
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <h1>Bem vindo a nossa clínica.</h1>
-      <Navbar paths={paths}></Navbar>
+    <main>
+      <Navbar routeNavigation={routeNavigation}></Navbar>
     </main>
   )
 }
