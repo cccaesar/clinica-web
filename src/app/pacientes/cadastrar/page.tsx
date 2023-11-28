@@ -12,11 +12,11 @@ export interface GenericInputInterface {
     options?: string[];
 }
 
-export default function CadastrarMedico() {
+export default function CadastrarPaciente() {
     const routeNavigation = [
         { name: 'Home', path: '/', current: false },
-        { name: 'Médicos', path: '/medicos', current: true },
-        { name: 'Pacientes', path: '/pacientes', current: false },
+        { name: 'Médicos', path: '/medicos', current: false },
+        { name: 'Pacientes', path: '/pacientes', current: true },
         { name: 'Consultas', path: '/consultas', current: false },
     ];
     const inputs: GenericInputInterface[] = [
@@ -42,19 +42,11 @@ export default function CadastrarMedico() {
             autoComplete: 'phone',
         },
         {
-            label: 'CRM',
+            label: 'CPF',
             type: 'text',
-            id: 'crm',
-            name: 'crm',
-            autoComplete: 'crm',
-        },
-        {
-            label: 'Especialidade',
-            type: 'select',
-            id: 'especialidade',
-            name: 'especialidade',
-            autoComplete: 'especialidade',
-            options: ['Ortopedia', 'Cardiologia', 'Ginecologia', 'Dermatologia']
+            id: 'cpf',
+            name: 'cpf',
+            autoComplete: 'cpf',
         },
         {
             label: 'Logradouro',
@@ -141,7 +133,7 @@ export default function CadastrarMedico() {
             <Navbar routeNavigation={routeNavigation}></Navbar>
             <div className="mx-auto max-w-7xl px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
                 <div className="mx-auto max-w-2xl">
-                    <h1 className="text-base font-semibold leading-7 text-white-900">Preencha corretamente os dados do(a) medico(a)</h1>
+                    <h1 className="text-base font-semibold leading-7 text-white-900">Preencha corretamente os dados do(a) paciente</h1>
                     <Form inputs={inputs}></Form>
                 </div>
             </div>

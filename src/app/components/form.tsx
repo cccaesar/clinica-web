@@ -26,9 +26,9 @@ export default function Form({ inputs }: { inputs: any[] }) {
                     <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                         {formattedInputs.map(input => {
                             if(isSelect(input))
-                                return (<Select input={input}></Select>)
+                                return (<Select key={input.name} input={input}></Select>)
                             else
-                                return (<Input input={input}></Input>)
+                                return (<Input key={input.name} input={input}></Input>)
                         })}
                     </div>
                 </div>
