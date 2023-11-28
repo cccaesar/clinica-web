@@ -1,5 +1,6 @@
 'use client'
-import Navbar from "../components/navbar"
+import Navbar from "../components/navbar";
+import Features from "../components/features";
 
 export default function Medicos() {
     const routeNavigation = [
@@ -8,9 +9,12 @@ export default function Medicos() {
         { name: 'Pacientes', path: 'pacientes', current: false },
         { name: 'Consultas', path: 'consultas', current: false },
     ]
+    const featuresTitle = 'Aqui você poderá cadastrar, atualizar ou excluir os médicos registrados';
+    const featuresDescription = 'Oferecemos serviços de ortopedia, cardiologia, ginecologia e dermatologia.';
     return (
         <main>
             <Navbar routeNavigation={routeNavigation}></Navbar>
+            <Features title={featuresTitle} description={featuresDescription} subject='medicos'></Features>
         </main>
     )
 }
