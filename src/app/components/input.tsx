@@ -5,6 +5,8 @@ export interface InputInterface {
     placeholder?: string;
     id: string;
     autoComplete?: string;
+    maxlength?: number;
+    minLength?: number;
 }
 
 export default function Input({ input }: { input: InputInterface }) {
@@ -14,5 +16,7 @@ export default function Input({ input }: { input: InputInterface }) {
             name={input.name}
             autoComplete={input.autoComplete}
             type={input.type}
-            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" /></div></div>)
+            maxLength={input.maxlength}
+            minLength={input.minLength}
+            className="block w-full rounded-md border-0 p-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" /></div></div>)
 }

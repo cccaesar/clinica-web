@@ -1,6 +1,7 @@
 'use client'
 import Navbar from "../../components/navbar";
 import Form from "../../components/form";
+import { register } from "@/app/medicos/cadastrar/actions";
 
 export interface GenericInputInterface {
     label: string;
@@ -23,9 +24,9 @@ export default function CadastrarMedico() {
         {
             label: 'Nome',
             type: 'text',
-            id: 'name',
-            name: 'name',
-            autoComplete: 'name',
+            id: 'nome',
+            name: 'nome',
+            autoComplete: 'nome',
         },
         {
             label: 'E-mail',
@@ -142,7 +143,7 @@ export default function CadastrarMedico() {
             <div className="mx-auto max-w-7xl px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
                 <div className="mx-auto max-w-2xl">
                     <h1 className="text-base font-semibold leading-7 text-white-900">Preencha corretamente os dados do(a) medico(a)</h1>
-                    <Form inputs={inputs}></Form>
+                    <Form inputs={inputs} action={register}></Form>
                 </div>
             </div>
         </main>

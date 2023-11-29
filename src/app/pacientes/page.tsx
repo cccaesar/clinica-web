@@ -9,7 +9,7 @@ export default function Pacientes() {
         { name: 'Pacientes', path: 'pacientes', current: true },
         { name: 'Consultas', path: 'consultas', current: false },
     ]
-    const featuresTitle = 'Aqui você poderá cadastrar, atualizar ou excluir os pacientes registrados';
+    const featuresTitle = 'Aqui você poderá cadastrar, atualizar, excluir ou apenas ver dados dos pacientes';
     const featuresDescription = 'É necessário cadastrar os pacientes antes de marcar consultas para eles';
     const registerDescription = 'Cadastre um(a) novo(a) paciente'
     return (

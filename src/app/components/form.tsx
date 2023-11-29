@@ -2,6 +2,9 @@ import Input from "./input";
 import Select from "./select";
 import { SelectInterface } from "./select";
 import { InputInterface } from "./input";
+//import { useFormState } from 'react-final-form';
+//import { useFormStatus } from 'react-hook-form';
+import { useFormStatus } from 'react-dom'
 
 export interface FormattedInputs {
     comboboxes: SelectInterface[];
@@ -12,7 +15,18 @@ function isSelect(input: SelectInterface | InputInterface): input is SelectInter
     return (input as SelectInterface).options !== undefined;
 }
 
-export default function Form({ inputs }: { inputs: any[] }) {
+function SubmitButton() {
+    const { pending } = useFormStatus()
+  
+    return (
+      <button className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+      type="submit" aria-disabled={pending}>
+        Salvar
+      </button>
+    )
+  }
+
+export default function Form({ inputs, action }: { inputs: any[], action: any }) {
     const formattedInputs: (SelectInterface | InputInterface)[] = inputs.map(input => {
         if (input.type === 'select')
             return input as SelectInterface;
@@ -20,7 +34,7 @@ export default function Form({ inputs }: { inputs: any[] }) {
             return input as InputInterface;
     })
     return (
-        <form>
+        <form action={action}>
             <div className="space-y-12">
                 <div className="border-gray-900/10 pb-12">
                     <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
@@ -35,12 +49,7 @@ export default function Form({ inputs }: { inputs: any[] }) {
             </div>
 
             <div className="mt-6 flex items-center justify-end gap-x-6">
-                <button
-                    type="submit"
-                    className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                >
-                    Save
-                </button>
+                <SubmitButton/>
             </div>
         </form>
     )
