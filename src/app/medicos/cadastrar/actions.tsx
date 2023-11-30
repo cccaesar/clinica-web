@@ -2,7 +2,7 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import axios from "axios";
 
-export async function register(prevState: any, formData: FormData) {
+export async function register(formData: FormData) {
   const schema = z.object({
     nome: z.string(),
     email: z.string().email(),
@@ -22,7 +22,7 @@ export async function register(prevState: any, formData: FormData) {
   const parse = schema.safeParse({
     nome: formData.get('nome'),
     crm: formData.get('crm'),
-    especialidade: formData.get('especialidade'),
+    especialidade: formData.get('especialidade')?.toString().toUpperCase(),
     email: formData.get('email'),
     telefone: formData.get('phone'),
     endereco: {
@@ -43,7 +43,8 @@ export async function register(prevState: any, formData: FormData) {
   const data = parse.data
 
   try {
-    await axios.post(`http://localhost:8080/medico`, data)
+    const res = await axios.post(`http://localhost:3000/api/medico`, data)
+    console.log('res', res);
     revalidatePath('/')
     return { message: `Medico ${data.crm} registrado` }
   } catch (e) {
@@ -51,7 +52,7 @@ export async function register(prevState: any, formData: FormData) {
   }
 }
 
-export async function deactivate(prevState: any, formData: FormData) {
+export async function deactivate(formData: FormData) {
   const schema = z.object({
     crm: z.string(),
   })
@@ -60,7 +61,7 @@ export async function deactivate(prevState: any, formData: FormData) {
   })
 
   try {
-    await axios.delete(`http://localhost:8080/medico/${data.crm}`)
+    await axios.delete(`http://localhost:3000/api/medico/${data.crm}`)
     revalidatePath('/')
     return { message: `Médico ${data.crm} deletado` }
   } catch (e) {

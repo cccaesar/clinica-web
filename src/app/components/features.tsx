@@ -1,17 +1,7 @@
 import { PlusIcon } from '@heroicons/react/24/outline'
 import { useRouter } from 'next/navigation';
-import { ForwardRefExoticComponent, SVGProps, RefAttributes } from 'react';
 
-interface featuresInterface {
-  name: string;
-  description: string;
-  icon: ForwardRefExoticComponent<Omit<SVGProps<SVGSVGElement>, "ref"> & {
-    title?: string | undefined;
-    titleId?: string | undefined;
-  } & RefAttributes<SVGSVGElement>>;
-};
-
-export default function Features({title, description, subject, registerDescription}: {title: string, description: string, subject: string, registerDescription: string}) {
+export default function Features({ title, description, subject, registerDescription, children, }: { title: string, description: string, subject: string, registerDescription: string, children: React.ReactNode }) {
   const router = useRouter();
   return (
     <div className="bg-white py-24 sm:py-32">
@@ -38,6 +28,7 @@ export default function Features({title, description, subject, registerDescripti
             </div>
           </dl>
         </div>
+        {children}
       </div>
     </div>
   )

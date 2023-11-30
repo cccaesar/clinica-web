@@ -1,6 +1,8 @@
+'use client'
 import { useRouter } from 'next/navigation';
 import { Disclosure } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import Image from 'next/image';
 
 interface routeNavigation {
     name: string;
@@ -33,10 +35,12 @@ export default function Navbar({routeNavigation}: {routeNavigation: routeNavigat
                             </div>
                             <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
                                 <div className="flex flex-shrink-0 items-center">
-                                    <img
+                                    <Image
                                         className="h-8 w-auto"
                                         src="/medical_symbol.svg"
                                         alt="Clinica"
+                                        width={32}
+                                        height={32}
                                     />
                                 </div>
                                 <div className="hidden sm:ml-6 sm:block">

@@ -42,7 +42,7 @@ export async function register(formData: FormData) {
   const data = parse.data
 
   try {
-    await axios.post(`http://localhost:8080/paciente`, data);
+    await axios.post(`http://localhost:3000/api/paciente`, data);
     revalidatePath('/')
     window.alert(`Paciente ${data.cpf} registrado`);
     return { message: `Paciente ${data.cpf} registrado` }
@@ -60,7 +60,7 @@ export async function deactivate(formData: FormData) {
   })
 
   try {
-    await axios.delete(`http://localhost:8080/paciente/${data.cpf}`)
+    await axios.delete(`http://localhost:3000/api/paciente/${data.cpf}`)
     revalidatePath('/')
     return { message: `Paciente ${data.cpf} deletado` }
   } catch (e) {

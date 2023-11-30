@@ -2,3 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 @tailwind forms;
+
+.disabled {
+    pointer-events: none;
+    background-color: rgb(192, 192, 192);
+}
