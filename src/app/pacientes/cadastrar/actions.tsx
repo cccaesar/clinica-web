@@ -7,9 +7,9 @@ export async function register(formData: FormData) {
     nome: z.string(),
     email: z.string().email(),
     telefone: z.string(),
-    cpf: z.string().length(11),
+    cpf: z.string(),
     endereco: z.object({
-      cep: z.string().min(8).max(9),
+      cep: z.string(),
       logradouro: z.string(),
       bairro: z.string(),
       cidade: z.string(),

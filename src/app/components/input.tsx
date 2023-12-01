@@ -3,10 +3,13 @@ export interface InputInterface {
     name: string;
     type: string;
     placeholder?: string;
+    value?: string;
+    disabled?: boolean;
     id: string;
     autoComplete?: string;
     maxlength?: number;
     minLength?: number;
+    onChange?: any;
 }
 
 export default function Input({ input }: { input: InputInterface }) {
@@ -18,5 +21,8 @@ export default function Input({ input }: { input: InputInterface }) {
             type={input.type}
             maxLength={input.maxlength}
             minLength={input.minLength}
+            value={input.value}
+            disabled={input.disabled || false}
+            onChange={input.onChange || undefined}
             className="block w-full rounded-md border-0 p-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" /></div></div>)
 }

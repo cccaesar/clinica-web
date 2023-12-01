@@ -2,8 +2,6 @@ import Input from "./input";
 import Select from "./select";
 import { SelectInterface } from "./select";
 import { InputInterface } from "./input";
-//import { useFormState } from 'react-final-form';
-//import { useFormStatus } from 'react-hook-form';
 import { useFormStatus } from 'react-dom'
 
 export interface FormattedInputs {

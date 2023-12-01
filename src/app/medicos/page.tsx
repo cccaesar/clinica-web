@@ -1,6 +1,7 @@
 'use client'
 import Navbar from "../components/navbar";
 import Features from "../components/features";
+import Pagination from "../components/pagination";
 
 export default function Medicos() {
     const routeNavigation = [
@@ -15,7 +16,9 @@ export default function Medicos() {
     return (
         <main>
             <Navbar routeNavigation={routeNavigation}></Navbar>
-            <Features title={featuresTitle} description={featuresDescription} subject='medicos' registerDescription={registerDescription}></Features>
+            <Features title={featuresTitle} description={''} subject='medicos' registerDescription={registerDescription}>
+                <Pagination entityName='medico' />
+            </Features>
         </main>
     )
 }

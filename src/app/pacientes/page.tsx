@@ -17,7 +17,7 @@ export default function Pacientes() {
     return (
         <main>
             <Navbar routeNavigation={routeNavigation}></Navbar>
-            <Features title={featuresTitle} description={featuresDescription} subject='pacientes' registerDescription={registerDescription}>
+            <Features title={featuresTitle} description={''} subject='pacientes' registerDescription={registerDescription}>
                 <Pagination entityName='paciente'/>
             </Features>
         </main>

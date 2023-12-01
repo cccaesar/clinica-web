@@ -1,3 +1,4 @@
+import Features from './components/features'
 import Navbar from './components/navbar'
 
 export default function Home() {
@@ -10,6 +11,15 @@ export default function Home() {
   return (
     <main>
       <Navbar routeNavigation={routeNavigation}></Navbar>
+      <div className="bg-white py-24 sm:py-32">
+      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+        <div className="mx-auto max-w-2xl lg:text-center">
+          <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+            Bem vindo ao portal da nossa clínica!
+          </p>
+        </div>
+      </div>
+    </div>
     </main>
   )
 }
