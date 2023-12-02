@@ -39,19 +39,15 @@ export async function update(formData: FormData) {
         }).optional(),
     })
 
-    const isEnderecoValid = schema.safeParse({ endereco: formData.get('endereco') }).success;
+    const formDataEntries = Object.fromEntries(formData.entries());
+    const nonEmptyFormData = Object.fromEntries(
+        Object.entries(formDataEntries).filter(([, value]) => value !== '' && value !== null)
+    );
 
-    const parse = isEnderecoValid ? schema.safeParse({
-        nome: formData.get('nome'),
-        telefone: formData.get('phone'),
-        endereco: formData.get('endereco'),
-    }) : schema.safeParse({
-        nome: formData.get('nome'),
-        telefone: formData.get('phone'),
-    });
+    const parse = schema.safeParse(nonEmptyFormData);
 
     if (!parse.success) {
-        return { message: 'Failed to update medico' }
+        return { message: 'Formulário invalido' }
     }
 
     const data = parse.data

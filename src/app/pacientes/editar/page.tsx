@@ -1,13 +1,14 @@
 'use client'
+
 import { z } from 'zod';
+import { useSearchParams, useRouter } from 'next/navigation'
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
 
 import Navbar from "../../components/navbar";
 import Form from "../../components/form";
 import { estados } from "@/consts/estados";
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 
 export interface GenericInputInterface {
     label: string;
@@ -16,65 +17,62 @@ export interface GenericInputInterface {
     placeholder?: string;
     id: string;
     autoComplete?: string;
+    value?: string;
     options?: string[];
+    onChange?: any;
 }
 
-export async function register(formData: FormData) {
+export async function update(formData: FormData) {
+    const searchParams = new URLSearchParams(document.location.search);
+    const cpf = searchParams.get('id')
     const schema = z.object({
-        nome: z.string(),
-        email: z.string().email(),
-        telefone: z.string(),
-        crm: z.string(),
-        especialidade: z.string(),
+        nome: z.string().optional(),
+        telefone: z.string().optional(),
         endereco: z.object({
-            cep: z.string(),
-            logradouro: z.string(),
-            bairro: z.string(),
-            cidade: z.string(),
-            uf: z.string(),
+            cep: z.string().optional(),
+            logradouro: z.string().optional(),
+            bairro: z.string().optional(),
+            cidade: z.string().optional(),
+            uf: z.string().optional(),
             complemento: z.string().optional(),
-            numero: z.string().optional()
-        })
-    })
-    const parse = schema.safeParse({
-        nome: formData.get('nome'),
-        crm: formData.get('crm'),
-        especialidade: formData.get('especialidade')?.toString().toUpperCase(),
-        email: formData.get('email'),
-        telefone: formData.get('phone'),
-        endereco: {
-            cep: formData.get('cep'),
-            logradouro: formData.get('logradouro'),
-            bairro: formData.get('bairro'),
-            cidade: formData.get('cidade'),
-            uf: formData.get('uf'),
-            complemento: formData.get('complemento'),
-            numero: formData.get('numero')
-        }
+            numero: z.string().optional(),
+        }).optional(),
     })
 
+    const formDataEntries = Object.fromEntries(formData.entries());
+    const nonEmptyFormData = Object.fromEntries(
+        Object.entries(formDataEntries).filter(([, value]) => value !== '' && value !== null)
+    );
+
+    const parse = schema.safeParse(nonEmptyFormData);
+
     if (!parse.success) {
-        return { message: 'Formulário invalido', error: parse.error.message }
+        return { message: 'Formulário invalido' }
     }
 
     const data = parse.data
 
     try {
-        const res = await axios.post(`http://localhost:3000/api/medico`, data)
-        return { message: `Medico ${data.crm} registrado`, data: res.data }
+        const res = await axios.patch(`http://localhost:3000/api/paciente/${cpf}`, data);
+        return { message: `Dados do paciente atualizados com sucesso`, data: res.data }
     } catch (e: any) {
         const errorMessage: string = e?.message || ''
-        return { message: 'Não foi possivel registrar esse médico', error: errorMessage }
+        return { message: 'Não foi possivel atualizar esse médico', error: errorMessage }
     }
 }
 
-export default function CadastrarMedico() {
+export default function EditarPaciente() {
+    const router = useRouter();
+    const searchParams = useSearchParams()
+    const id = searchParams.get('id')
     const routeNavigation = [
         { name: 'Home', path: '/', current: false },
         { name: 'Médicos', path: '/medicos', current: true },
         { name: 'Pacientes', path: '/pacientes', current: false },
         { name: 'Consultas', path: '/consultas', current: false },
     ];
+    const [nome, setNome] = useState('');
+    const [error, setError] = useState('');
     const inputs: GenericInputInterface[] = [
         {
             label: 'Nome',
@@ -84,33 +82,11 @@ export default function CadastrarMedico() {
             autoComplete: 'nome',
         },
         {
-            label: 'E-mail',
-            type: 'email',
-            id: 'email',
-            name: 'email',
-            autoComplete: 'email',
-        },
-        {
             label: 'Telefone',
             type: 'tel',
-            id: 'phone',
-            name: 'phone',
+            id: 'telefone',
+            name: 'telefone',
             autoComplete: 'phone',
-        },
-        {
-            label: 'CRM',
-            type: 'text',
-            id: 'crm',
-            name: 'crm',
-            autoComplete: 'crm',
-        },
-        {
-            label: 'Especialidade',
-            type: 'select',
-            id: 'especialidade',
-            name: 'especialidade',
-            autoComplete: 'especialidade',
-            options: ['Ortopedia', 'Cardiologia', 'Ginecologia', 'Dermatologia']
         },
         {
             label: 'Logradouro',
@@ -153,7 +129,7 @@ export default function CadastrarMedico() {
             id: 'uf',
             name: 'uf',
             autoComplete: 'uf',
-            options: estados
+            options: estados,
         },
         {
             label: 'CEP',
@@ -163,14 +139,24 @@ export default function CadastrarMedico() {
             autoComplete: 'cep',
         },
     ]
-
-    const router = useRouter();
-    const [error, setError] = useState('');
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
-    const handleRegister = async (formData: any) => {
-        const result = await register(formData);
+    const fetchData = useCallback(async () => {
+        try {
+            const res = await axios.get(`http://localhost:3000/api/paciente/${id}`);
+            setNome(res.data['nome']);
+        } catch (e) {
+            console.error('Error fetching data:', e);
+        }
+    }, [id]);
+
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
+
+    const handleUpdate = async (formData: any) => {
+        const result = await update(formData);
         if (result?.data) {
-            router.push('/medicos');
+            router.push('/pacientes');
         } else {
             setError(result?.error || '');
             onOpen();
@@ -182,15 +168,15 @@ export default function CadastrarMedico() {
             <Navbar routeNavigation={routeNavigation}></Navbar>
             <div className="mx-auto max-w-7xl px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
                 <div className="mx-auto max-w-2xl">
-                    <h1 className="text-base font-semibold leading-7 text-white-900">Preencha corretamente os dados do(a) medico(a)</h1>
-                    <Form inputs={inputs} action={handleRegister}></Form>
+                    <h1 className="text-base font-semibold leading-7 text-white-900">Preencha corretamente os dados do(a) paciente {nome}</h1>
+                    <Form inputs={inputs} action={handleUpdate}></Form>
                 </div>
             </div>
             <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <ModalHeader className="flex flex-col gap-1">Erro ao cadastrar os dados do médico</ModalHeader>
+                            <ModalHeader className="flex flex-col gap-1">Erro ao atualizar os dados do médico</ModalHeader>
                             <ModalBody>
                                 <p>
                                     {error}
@@ -200,7 +186,7 @@ export default function CadastrarMedico() {
                                 </p>
                             </ModalBody>
                             <ModalFooter>
-                                <Button color="primary" variant="light" onPress={onClose}>
+                                <Button color="danger" variant="light" onPress={onClose}>
                                     Entendi
                                 </Button>
                             </ModalFooter>
