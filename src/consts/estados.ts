@@ -1,4 +1,6 @@
-export const estados: string[] = ["Acre",
+export const estados: string[] = [
+"",    
+"Acre",
 "Alagoas",
 "Amapá",
 "Amazonas",

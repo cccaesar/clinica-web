@@ -1,11 +1,14 @@
 'use client'
-import Navbar from "../../components/navbar";
-import Form from "../../components/form";
+
 import { z } from 'zod';
-import { estados } from "@/consts/estados";
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
+
+import Navbar from "../../components/navbar";
+import Form from "../../components/form";
+import { estados } from "@/consts/estados";
 
 export interface GenericInputInterface {
     label: string;
@@ -20,47 +23,46 @@ export interface GenericInputInterface {
 }
 
 export async function update(formData: FormData) {
-  const searchParams = new URLSearchParams(document.location.search);
-  const crm = searchParams.get('id')
-  const schema = z.object({
-    nome: z.string(),
-    telefone: z.string(),
-    endereco: z.object({
-      cep: z.string(),
-      logradouro: z.string(),
-      bairro: z.string(),
-      cidade: z.string(),
-      uf: z.string(),
-      complemento: z.string().optional(),
-      numero: z.string().optional()
+    const searchParams = new URLSearchParams(document.location.search);
+    const crm = searchParams.get('id')
+    const schema = z.object({
+        nome: z.string().optional(),
+        telefone: z.string().optional(),
+        endereco: z.object({
+            cep: z.string().optional(),
+            logradouro: z.string().optional(),
+            bairro: z.string().optional(),
+            cidade: z.string().optional(),
+            uf: z.string().optional(),
+            complemento: z.string().optional(),
+            numero: z.string().optional(),
+        }).optional(),
     })
-  })
-  const parse = schema.safeParse({
-    nome: formData.get('nome'),
-    telefone: formData.get('phone'),
-    endereco: {
-      cep: formData.get('cep'),
-      logradouro: formData.get('logradouro'),
-      bairro: formData.get('bairro'),
-      cidade: formData.get('cidade'),
-      uf: formData.get('uf'),
-      complemento: formData.get('complemento'),
-      numero: formData.get('numero')
+
+    const isEnderecoValid = schema.safeParse({ endereco: formData.get('endereco') }).success;
+
+    const parse = isEnderecoValid ? schema.safeParse({
+        nome: formData.get('nome'),
+        telefone: formData.get('phone'),
+        endereco: formData.get('endereco'),
+    }) : schema.safeParse({
+        nome: formData.get('nome'),
+        telefone: formData.get('phone'),
+    });
+
+    if (!parse.success) {
+        return { message: 'Failed to update medico' }
     }
-  })
 
-  if (!parse.success) {
-    return { message: 'Failed to update medico' }
-  }
+    const data = parse.data
 
-  const data = parse.data
-
-  try {
-    const res = await axios.patch(`http://localhost:3000/api/medico/${crm}`, data);
-    return { message: `Dados do médico atualizados com sucesso` }
-  } catch (e) {
-    return { message: 'Não foi possivel registrar esse médico' }
-  }
+    try {
+        const res = await axios.patch(`http://localhost:3000/api/medico/${crm}`, data);
+        return { message: `Dados do médico atualizados com sucesso`, data: res.data }
+    } catch (e: any) {
+        const errorMessage: string = e?.message || ''
+        return { message: 'Não foi possivel atualizar esse médico', error: errorMessage }
+    }
 }
 
 export default function EditarMedico() {
@@ -74,6 +76,7 @@ export default function EditarMedico() {
         { name: 'Consultas', path: '/consultas', current: false },
     ];
     const [nome, setNome] = useState('');
+    const [error, setError] = useState('');
     const inputs: GenericInputInterface[] = [
         {
             label: 'Nome',
@@ -140,7 +143,7 @@ export default function EditarMedico() {
             autoComplete: 'cep',
         },
     ]
-
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const fetchData = useCallback(async () => {
         try {
             const res = await axios.get(`http://localhost:3000/api/medico/${id}`);
@@ -156,7 +159,12 @@ export default function EditarMedico() {
 
     const handleUpdate = async (formData: any) => {
         const result = await update(formData);
-        //router.push('/medicos');
+        if (result?.data) {
+            router.push('/medicos');
+        } else {
+            setError(result?.error || '');
+            onOpen();
+        }
     };
 
     return (
@@ -168,6 +176,28 @@ export default function EditarMedico() {
                     <Form inputs={inputs} action={handleUpdate}></Form>
                 </div>
             </div>
+            <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader className="flex flex-col gap-1">Erro ao atualizar os dados do médico</ModalHeader>
+                            <ModalBody>
+                                <p>
+                                    {error}
+                                </p>
+                                <p>
+                                    Verifique se preencheu corretamente o formulário, caso contrário tente mais tarde
+                                </p>
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button color="danger" variant="light" onPress={onClose}>
+                                    Entendi
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
         </main>
     )
 }
