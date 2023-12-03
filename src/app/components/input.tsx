@@ -12,7 +12,7 @@ export interface InputInterface {
     onChange?: any;
 }
 
-export default function Input({ input }: { input: InputInterface }) {
+export default function CustomInput({ input }: { input: InputInterface }) {
     return (
         <div className="sm:col-span-3"><label htmlFor={input.name} className="block text-sm font-medium leading-6 text-white-900">{input.label}</label><div className="mt-2"><input
             id={input.id}

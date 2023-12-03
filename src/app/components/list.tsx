@@ -1,17 +1,73 @@
 'use client'
 import { PencilSquareIcon, TrashIcon, UserIcon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/navigation";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
+import {
+    Modal,
+    ModalContent,
+    ModalHeader,
+    ModalBody,
+    ModalFooter,
+    Button,
+    useDisclosure,
+    Avatar
+} from "@nextui-org/react";
 import axios from "axios";
 import { useState } from "react";
+import { format } from "date-fns";
+import { MotivoCancelamento } from "@/consts/motivo-cancelamento";
 
-export interface ItemInterface {
+export interface MedicInterface {
     nome: string;
     email: string;
-    cpf?: string;
-    crm?: string;
-    telefone?: string;
-    especialidade?: string;
+    crm: string;
+    especialidade: string;
+}
+
+export interface PatientInterface {
+    nome: string;
+    email: string;
+    cpf: string;
+    telefone: string;
+}
+
+export interface AppointmentInterface {
+    id: string;
+    pacienteNome: string;
+    pacienteCpf: string;
+    medicoNome: string;
+    medicoCrm: string;
+    medicoEspecialidade: string;
+    dataHora: string;
+    motivoCancelamento: string | null;
+}
+
+function isMedic(input: MedicInterface | PatientInterface | AppointmentInterface): input is MedicInterface {
+    return (input as MedicInterface).crm !== undefined;
+}
+
+function isPerson(input: MedicInterface | PatientInterface | AppointmentInterface): input is MedicInterface | PatientInterface {
+    return (input as MedicInterface).email !== undefined;
+}
+
+function isPatient(input: MedicInterface | PatientInterface | AppointmentInterface): input is PatientInterface {
+    return (input as PatientInterface).cpf !== undefined;
+}
+
+function isAppointment(input: MedicInterface | PatientInterface | AppointmentInterface): input is AppointmentInterface {
+    return (input as AppointmentInterface).dataHora !== undefined;
+}
+
+function getItemType(item: MedicInterface | PatientInterface | AppointmentInterface): string {
+    if (isMedic(item)) {
+        return 'medico';
+    }
+    else if (isPatient(item)) {
+        return 'paciente';
+    }
+    else if (isAppointment(item)) {
+        return 'consulta';
+    }
+    return ''
 }
 
 export async function deactivate(itemType: string, id: string) {
@@ -25,7 +81,15 @@ export async function deactivate(itemType: string, id: string) {
     }
 }
 
-export default function List({ items }: { items: ItemInterface[] }) {
+export default function List({ items }: { items: any[] }) {
+    const formattedItems: (MedicInterface | PatientInterface | AppointmentInterface)[] = items.map(item => {
+        if (isMedic(item))
+            return item as MedicInterface;
+        else if (isPatient(item))
+            return item as PatientInterface;
+        else
+            return item as AppointmentInterface;
+    })
     const [itemType, setItemType] = useState('');
     const [chosenId, setChosenId] = useState('');
     const router = useRouter();
@@ -35,45 +99,75 @@ export default function List({ items }: { items: ItemInterface[] }) {
     };
     return (
         <>
-            <ul role="list" className="divide-y divide-gray-100">
-                {items.map((person) => (
-                    <li key={person.email} className="flex justify-between gap-x-6 py-5">
+            <ul role="list" className={`divide-y divide-gray-100`}>
+                {formattedItems.map((item) => (
+                    <li key={isPerson(item) ? item?.email : item?.id} className={`flex justify-between gap-x-6 py-5`}>
                         <div className="flex min-w-0 gap-x-4">
-                            <UserIcon className="h-12 w-12 flex-none rounded-full" />
-                            <div className="min-w-0 flex-auto">
-                                <p className="text-sm font-semibold leading-6 text-gray-900">{person.nome}</p>
-                                <p className="mt-1 truncate text-xs leading-5 text-gray-500">{person.email}</p>
-                            </div>
-                            <div className="min-w-0 flex-auto">
+                            <Avatar name={isAppointment(item) ? item.id : item.nome} className="h-12 w-12 flex-none rounded-full" />
+                            {isPerson(item) ?
+                                (
+                                    <div className="min-w-0 flex-auto">
+                                        <p className="text-sm font-semibold leading-6 text-gray-900">{item.nome}</p>
+                                        <p className="mt-1 truncate text-xs leading-5 text-gray-500">{item.email}</p>
+                                    </div>
+                                ) : (
+                                    <div className="min-w-0 flex-auto">
+                                        <p className="text-sm font-semibold leading-6 text-gray-900">Especialidade do médico: {item.medicoEspecialidade.toLowerCase()}</p>
+                                        <p className="mt-1 truncate text-xs leading-5 text-gray-500">Data e hora da consulta: {format(new Date(item.dataHora), 'dd/MM/yyyy HH:mm')}</p>
+                                    </div>
+                                )}
+                            {isPerson(item) && (<div className="min-w-0 flex-auto">
                                 <a
                                     className="cursor-pointer"
-                                    onClick={() => router.push(`${person.crm ? 'medicos' : 'pacientes'}/editar?id=${person.crm || person.cpf || ''}`)}>
+                                    onClick={() => router.push(`${getItemType(item)}s/editar?id=${isMedic(item) ? item.crm : item.cpf}`)}>
                                     <PencilSquareIcon className="h-3 w-3 flex-none" />
                                 </a>
-                            </div>
-                            <div className="min-w-0 flex-auto">
+                            </div>)}
+                            { isPerson(item) || item.motivoCancelamento === null && (<div className="min-w-0 flex-auto">
                                 <a
                                     className="cursor-pointer"
                                     onClick={() => {
-                                        setItemType(person.crm ? 'medico' : 'paciente')
-                                        setChosenId(person?.crm || person?.cpf || '');
-                                        onOpenChange();
+                                        if(isPerson(item)) {
+                                            setItemType(getItemType(item))
+                                            setChosenId(() => {
+                                                if (isMedic(item)) {
+                                                    return item.crm;
+                                                }
+                                                return item.cpf;
+                                            });
+                                            onOpenChange();
+                                        } else {
+                                            router.push(`/consultas/cancelar?id=${item.id}`)
+                                        }
                                     }}>
                                     <TrashIcon className="h-3 w-3 flex-none" />
                                 </a>
-                            </div>
+                            </div>)}
                         </div>
-                        {person.crm ? (
-                            <div className="mt-1 flex items-center gap-x-1.5">
-                                <p className="text-sm leading-6 text-gray-900">Especialidade: {`${person.especialidade?.toLowerCase()}`}</p>
-                                <p className="text-sm leading-6 text-gray-900">CRM: {person.crm}</p>
+                        {isMedic(item) && (
+                            <div className="mt-1 flex flex-col items-end gap-x-1.5">
+                                <p className="text-sm leading-6 text-gray-900">Especialidade: {`${item.especialidade?.toLowerCase()}`}</p>
+                                <p className="text-sm leading-6 text-gray-900">CRM: {item.crm}</p>
                             </div>
-                        ) : (
-                            <div className="mt-1 flex items-center gap-x-1.5">
-                                <p className="text-sm leading-6 text-gray-900">CPF: {person.cpf}</p>
-                                <p className="text-sm leading-6 text-gray-900">Telefone: {person.telefone}</p>
-                            </div>
-                        )}
+                        )
+                        }
+                        {
+                            isPatient(item) && (
+                                <div className="mt-1 flex flex-col items-end gap-x-1.5">
+                                    <p className="text-sm leading-6 text-gray-900">CPF: {item.cpf}</p>
+                                    <p className="text-sm leading-6 text-gray-900">Telefone: {item.telefone}</p>
+                                </div>
+                            )
+                        }
+                        {
+                            isAppointment(item) && (
+                                <div className="mt-1 flex flex-col items-end gap-x-1.5">
+                                    <p className="text-sm leading-6 text-gray-900">Médico: {item.medicoNome}</p>
+                                    <p className="text-sm leading-6 text-gray-900">Paciente: {item.pacienteNome}</p>
+                                    {isAppointment(item) && item.motivoCancelamento !== null && (<p className="text-sm leading-6 text-gray-900">Motivo de cancelamento: {MotivoCancelamento.getOptionLabel(item.motivoCancelamento)}</p>)}
+                                </div>
+                            )
+                        }
                     </li>
                 ))}
             </ul>
@@ -81,10 +175,10 @@ export default function List({ items }: { items: ItemInterface[] }) {
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <ModalHeader className="flex flex-col gap-1">Deseja realmente excluir esse {items[0].crm ? 'médico' : 'paciente'}?</ModalHeader>
+                            <ModalHeader className="flex flex-col gap-1">Deseja realmente excluir esse(a) {getItemType(items[0])}?</ModalHeader>
                             <ModalBody>
                                 <p>
-                                    Uma vez deletado, você não terá mais acesso aos dados desse {items[0].crm ? 'médico' : 'paciente'}
+                                    Uma vez deletado, você não terá mais acesso aos dados desse(a) {getItemType(items[0])}
                                 </p>
                             </ModalBody>
                             <ModalFooter>
@@ -92,7 +186,7 @@ export default function List({ items }: { items: ItemInterface[] }) {
                                     await handleDelete();
                                     onClose();
                                     router.push('/');
-                                    }}>
+                                }}>
                                     Deletar
                                 </Button>
                                 <Button color="primary" onPress={onClose}>

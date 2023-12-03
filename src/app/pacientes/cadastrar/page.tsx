@@ -53,8 +53,7 @@ export async function register(formData: FormData) {
   })
 
   if (!parse.success) {
-    console.log('parse.error.message', parse.error.message);
-    return { message: 'Formulário invalido' }
+    return { message: 'Formulário invalido', error: parse.error.message }
   }
 
   const data = parse.data
@@ -184,7 +183,7 @@ export default function CadastrarPaciente() {
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <ModalHeader className="flex flex-col gap-1">Erro ao cadastrar os dados do médico</ModalHeader>
+                            <ModalHeader className="flex flex-col gap-1">Erro ao cadastrar os dados do paciente</ModalHeader>
                             <ModalBody>
                                 <p>
                                     {error}

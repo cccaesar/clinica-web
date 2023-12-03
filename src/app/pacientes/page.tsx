@@ -1,6 +1,5 @@
 'use client'
 import Features from "../components/features";
-import List from "../components/list";
 import Navbar from "../components/navbar";
 import Pagination from "../components/pagination";
 

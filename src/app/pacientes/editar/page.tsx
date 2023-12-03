@@ -47,7 +47,7 @@ export async function update(formData: FormData) {
     const parse = schema.safeParse(nonEmptyFormData);
 
     if (!parse.success) {
-        return { message: 'Formulário invalido' }
+        return { message: 'Formulário invalido', error: parse.error.message }
     }
 
     const data = parse.data

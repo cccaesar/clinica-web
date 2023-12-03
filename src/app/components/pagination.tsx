@@ -1,10 +1,10 @@
-import List, { ItemInterface } from "../components/list";
+import List from "../components/list";
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
 
 export default function Pagination({ entityName }: { entityName: string }) {
   const [page, setPage] = useState(0);
-  const [items, setItems] = useState<ItemInterface[]>([]);
+  const [items, setItems] = useState<any[]>([]);
 
   const anchorClass: string =
     'relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50';
